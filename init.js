@@ -16,8 +16,11 @@ if (annyang) {
         Shiny.onInputChange('showPlot', 1);
     },
     
-    'filter :variable = :value': function(variable, value){
+    'filter variable :variable': function(variable){
         Shiny.onInputChange('filterVar', variable.toLowerCase());
+    },
+    
+    'filter value :value': function(value){
         Shiny.onInputChange('filterVal', value.toLowerCase());
     },
     
