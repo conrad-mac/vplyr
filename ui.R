@@ -11,16 +11,17 @@ navbarPage(
     header = singleton(tags$head(
         tags$script(src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"),
         tags$link(href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css", rel="stylesheet"),
-        includeScript('init.js')
+        includeScript('init.js'),
+        tags$link(rel = "stylesheet", type = "text/css", href = "vplyr.css")
     ))
     
     ,title = "vplyr - dplyr with voice recognition"
     
-    ,theme = shinytheme("superhero")
+    ,theme = shinytheme("darkly")
     
-    ,tabPanel("Data Analysis",
+    ,tabPanel("Analyse",
               fluidRow(
-                  column(9,
+                  column(12,
                          div(class="message",
                              HTML(
                                  '<p><i class="fa fa-fw fa-microphone"></i>
@@ -31,10 +32,16 @@ navbarPage(
                              )
                          ),
                          div(class="userSpeech"),
+                         br()
+                  )
+              ),
+              fluidRow(
+                  column(9,
                          conditionalPanel(
                              condition = "input.loadTable == 1",
                              verbatimTextOutput("table")
-                         ),
+                         )
+                         ,
                          conditionalPanel(
                              condition = "input.showPlot == 1",
                              plotlyOutput("plot")
@@ -44,34 +51,32 @@ navbarPage(
                          bsModal("commands_modal", "Voice commands", trigger = "commands", size = "large",
                                  p("To load the dataset, say ", 
                                    strong('"load data"')),
+                                 p("To hide the dataset, say ", 
+                                   strong('"hide data"')),
                                  p("To filter the dataset, say ", 
                                    strong('"filter variable + variable name (e.g. "filter variable class"). '),
                                    "Then say ",strong('"filter value + variable value (e.g. "filter value compact")"') ),
-                                 p("To show the plot, say ", 
-                                   strong('"show plot"')),
-                                 p("To show/hide commands list say ",
+                                 p("To show the plot window, say ", 
+                                   strong('"show plot window"')),
+                                 p("To plot a variable, say ", 
+                                   strong('"plot variable + variable name (e.g. "plot variable city")"')),
+                                 p("To show/hide the commands list say ",
                                    strong('"show/hide list"')),
                                  p("To reset all input paramaters say ",
                                    strong('"reset"'))
                          )
-                         # ,
+                         ,
                          
-                         # br(),
-                         
-                         # h3("Current inputs..."),
-                         # h4("The current verb is ", 
-                         #    strong(textOutput("currentVerb", inline = TRUE))),
-                         # h4("The current parameter is ", 
-                         #    strong(textOutput("currentParam1", inline = TRUE))),
-                         # h4("The current value is ", 
-                         #    strong(textOutput("currentVal1", inline = TRUE))),
-                         # h4("The current graph variable is ", 
-                         #    strong(textOutput("currentPlotVar1", inline = TRUE)))
+                         #Show current input paramaters
+                         h4(textOutput("currentFilterVar", inline = TRUE))
+                         ,h4(textOutput("currentFilterVal", inline = TRUE))
+                         ,h4(textOutput("currentSelectVar", inline = TRUE))
+                         ,h4(textOutput("currentPlotVar", inline = TRUE))
                          
                   )
               )
-    ),
-    tabPanel("About"
-             
     )
+    # ,tabPanel("About"
+    #          
+    # )
 )

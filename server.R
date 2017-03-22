@@ -3,7 +3,7 @@ library(shiny)
 function(input, output) {
     
     loadTable <- reactive({
-        mpg %>% #rename variables to be better understood by speech recognition
+        mpg %>% #rename variables so they are better understood by speech recognition
             rename(displacement = displ, 
                    cylinder = cyl,
                    transmission = trans, 
@@ -13,55 +13,79 @@ function(input, output) {
                    fuel = fl)
     })
     
-    filterTable <- reactive({
-        if(is.null(input$filterVar) | is.null(input$filterVal)){
-            return(loadTable())
-        }else {
-            filter_(.data = loadTable(), 
-                    .dots = interp(
-                        ~ x == input$filterVal, 
-                        x = as.name(input$filterVar)
-                    )
-            )
-        }
+    # modifyTable <- reactive({
+    #     if(is.null(input$filterVar) | is.null(input$filterVal)){
+    #         return(loadTable())
+    #     }else {
+    #         filter_(.data = loadTable(), 
+    #                 .dots = interp(
+    #                     ~ x == input$filterVal, 
+    #                     x = as.name(input$filterVar)
+    #                 )
+    #         )
+    #     }
+    #     
+    # })
+    
+    modifyTable <- reactive({
+        
+        #Load table in to object
+        dset <- loadTable()
+        
+        #Create switches for dplyr verbs
+        filter_switch <- !is.null(input$filterVar) & !is.null(input$filterVal)
+        select_switch <- !is.null(input$selectVar)
+        
+        #Pipe dataset through verbs
+        dset %>%
+        {if(filter_switch == TRUE) filter_(.data = ., .dots = interp(~x == y, x = as.name(input$filterVar), y = input$filterVal)) else .} %>%
+        {if(select_switch == TRUE) select_(.data = ., input$selectVar) else .} 
         
     })
     
     output$table <- renderPrint({
-        filterTable()
+        modifyTable()
     })
     
     output$plot <- renderPlotly({
         
-        if(is.null(input$plotvar)){
+        if(is.null(input$plotVar)){
             ggplotly(
                 ggplot() + 
-                    geom_point() + 
+                    geom_bar() + 
                     xlim(0, 10) + 
                     ylim(0, 100)
             )
             
         } else {
             ggplotly(
-                ggplot(data = filterTable()) +
-                    geom_bar(aes_string(input$plotvar), alpha = 0.6)
+                ggplot(data = modifyTable()) +
+                    geom_bar(aes_string(input$plotVar), alpha = 0.8)
             )
         }
     })
     
-    # output$currentVerb <- renderText({
-    #     paste(input$verb)
-    # })
-    # 
-    # output$currentParam1 <- renderText({
-    #     paste(input$param1)
-    # })
-    # 
-    # output$currentVal1 <- renderText({
-    #     paste(input$val1)
-    # })
-    # 
-    # output$currentPlotVar1 <- renderText({
-    #     paste(input$plotvar1)
-    # })
+    output$currentFilterVar <- renderText({
+        if(is.null(input$filterVar)){return()}
+        
+        paste("Current filter variable:", input$filterVar)
+    })
+    
+    output$currentFilterVal <- renderText({
+        if(is.null(input$filterVal)){return()}
+        
+        paste("Current filter value:", input$filterVal)
+    })
+    
+    output$currentSelectVar <- renderText({
+        if(is.null(input$selectVar)){return()}
+        
+        paste("Current select variable:", input$selectVar)
+    })
+    
+    output$currentPlotVar <- renderText({
+        if(is.null(input$plotVar)){return()}
+        
+        paste("Current plot variable:", input$plotVar)
+    })
 }

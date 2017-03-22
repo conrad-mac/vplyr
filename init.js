@@ -3,16 +3,22 @@ if (annyang) {
         
     // Set default values
     Shiny.onInputChange('loadTable', null);
-    Shiny.onInputChange('loadPlot', null);
+    Shiny.onInputChange('showPlot', null);
     Shiny.onInputChange('filterVar', null);
     Shiny.onInputChange('filterVal', null);
-    Shiny.onInputChange('plotvar', null);
+    Shiny.onInputChange('selectVar', null);
+    Shiny.onInputChange('plotVar', null);
 
   var commands = {
     'load data': function(){
         Shiny.onInputChange('loadTable', 1);
     },
-    'show plot': function(){
+    
+    'hide data': function(){
+        Shiny.onInputChange('loadTable', null);
+    },
+    
+    'show plot window': function(){
         Shiny.onInputChange('showPlot', 1);
     },
     
@@ -24,8 +30,12 @@ if (annyang) {
         Shiny.onInputChange('filterVal', value.toLowerCase());
     },
     
-    'plot :variable': function(variable){
-        Shiny.onInputChange('plotvar', variable.toLowerCase());
+    'select variable :variable': function(variable){
+        Shiny.onInputChange('selectVar', variable.toLowerCase());
+    },
+    
+    'plot variable :variable': function(variable){
+        Shiny.onInputChange('plotVar', variable.toLowerCase());
     },
     
     'show list': showModal,
@@ -33,10 +43,13 @@ if (annyang) {
     'hide list': hideModal,
     
     'reset': function(){
-        Shiny.onInputChange('verb', null);
-        Shiny.onInputChange('param1', null);
-        Shiny.onInputChange('val1', null);
-        Shiny.onInputChange('plotvar', null);
+        Shiny.onInputChange('loadTable', null);
+        Shiny.onInputChange('showPlot', null);
+        Shiny.onInputChange('filterVar', null);
+        Shiny.onInputChange('filterVal', null);
+        Shiny.onInputChange('selectVar', null);
+        Shiny.onInputChange('plotVar', null);
+        hideModal();
     }
   };
 
@@ -46,14 +59,15 @@ if (annyang) {
     //console.log(userSaid); // sample output: 'hello'
     //console.log(commandText); // sample output: 'hello (there)'
     //console.log(phrases); // sample output: ['hello', 'halo', 'yellow', 'polo', 'hello kitty']
-    $(".userSpeech").html("You said: " + phrases[0] +".");
+    //$(".userSpeech").html("You said: " + phrases[0] +".");
+    $(".userSpeech").html('<i class="fa fa-fw fa-commenting"></i> You said "' + userSaid +'".');
   });
 
   annyang.addCallback('resultNoMatch', function(phrases) {
     //console.log("I think the user said: ", phrases[0]);
     //console.log("But then again, it could be any of the following: ", phrases);
-    $(".userSpeech").html("Oops, it sounds like you said: " + phrases[0] + 
-    ". Please try again or say 'show list' for more options.");
+    $(".userSpeech").html('<i class="fa fa-fw fa-commenting"></i>Oops, it sounds like you said "' +
+    phrases[0] + '". Please try again or say "show list" for more options.');
     //$(".userSpeech").html("But then again, it could be any of the following: " + phrases);
   });
 
